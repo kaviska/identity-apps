@@ -35,11 +35,14 @@ import { Dispatch } from "redux";
 import { Icon, Label, Table } from "semantic-ui-react";
 import EditDevicePolicyWizard from "../components/edit-device-policy-wizard";
 import useGetDevicePolicyById from "../hooks/use-get-device-policy-by-id";
+import useGetDevicePolicyMetadata from "../hooks/use-get-device-policy-metadata";
 import {
     DevicePlatformType,
     DevicePolicyExpressionInterface,
+    DevicePolicyFieldDefinitionInterface,
     PolicyResourceResponseInterface
 } from "../models/device-policy";
+import { buildFieldDisplayMap, buildOperatorDisplayMap } from "../utils/device-policy-rule-utils";
 
 type DevicePolicyEditPagePropsInterface = IdentifiableComponentInterface & RouteComponentProps;
 
@@ -48,13 +51,6 @@ const PLATFORM_DISPLAY_NAMES: Record<string, string> = {
     ios: "iOS",
     macos: "macOS",
     windows: "Windows"
-};
-
-const OPERATOR_DISPLAY_NAMES: Record<string, string> = {
-    equals: "equals",
-    greaterThan: "greater than",
-    lessThan: "less than",
-    notEquals: "not equals"
 };
 
 const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface> = ({
@@ -90,6 +86,67 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
     const platformRules: PolicyResourceResponseInterface[] = useMemo(
         (): PolicyResourceResponseInterface[] => policy?.resources ?? [],
         [ policy ]
+    );
+
+    /* -- Metadata for display-name resolution (SWR caches by URL) ------- */
+
+    const platformsInPolicy: DevicePlatformType[] = useMemo(
+        (): DevicePlatformType[] =>
+            platformRules.map((r: PolicyResourceResponseInterface): DevicePlatformType =>
+                r.target as DevicePlatformType
+            ),
+        [ platformRules ]
+    );
+
+    const { data: androidMeta } =
+        useGetDevicePolicyMetadata("android", platformsInPolicy.includes("android"));
+    const { data: iosMeta } =
+        useGetDevicePolicyMetadata("ios", platformsInPolicy.includes("ios"));
+    const { data: macosMeta } =
+        useGetDevicePolicyMetadata("macos", platformsInPolicy.includes("macos"));
+    const { data: windowsMeta } =
+        useGetDevicePolicyMetadata("windows", platformsInPolicy.includes("windows"));
+
+    const allRawMeta: Record<DevicePlatformType, DevicePolicyFieldDefinitionInterface[] | undefined> =
+        useMemo((): Record<DevicePlatformType, DevicePolicyFieldDefinitionInterface[] | undefined> => ({
+            android: androidMeta,
+            ios: iosMeta,
+            macos: macosMeta,
+            windows: windowsMeta
+        }), [ androidMeta, iosMeta, macosMeta, windowsMeta ]);
+
+    const platformFieldMaps: Partial<Record<DevicePlatformType, Map<string, string>>> = useMemo(
+        (): Partial<Record<DevicePlatformType, Map<string, string>>> => {
+            const result: Partial<Record<DevicePlatformType, Map<string, string>>> = {};
+
+            ([ "android", "ios", "macos", "windows" ] as DevicePlatformType[]).forEach(
+                (p: DevicePlatformType): void => {
+                    if (allRawMeta[p]) {
+                        result[p] = buildFieldDisplayMap(allRawMeta[p]);
+                    }
+                }
+            );
+
+            return result;
+        },
+        [ allRawMeta ]
+    );
+
+    const platformOperatorMaps: Partial<Record<DevicePlatformType, Map<string, string>>> = useMemo(
+        (): Partial<Record<DevicePlatformType, Map<string, string>>> => {
+            const result: Partial<Record<DevicePlatformType, Map<string, string>>> = {};
+
+            ([ "android", "ios", "macos", "windows" ] as DevicePlatformType[]).forEach(
+                (p: DevicePlatformType): void => {
+                    if (allRawMeta[p]) {
+                        result[p] = buildOperatorDisplayMap(allRawMeta[p]);
+                    }
+                }
+            );
+
+            return result;
+        },
+        [ allRawMeta ]
     );
 
     const formatValue = (expression: DevicePolicyExpressionInterface): ReactNode => {
@@ -197,11 +254,16 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
                                                     ): ReactElement => (
                                                         <Table.Row key={ expression.field }>
                                                             <Table.Cell>
-                                                                <strong>{ expression.displayName }</strong>
+                                                                <strong>
+                                                                    { platformFieldMaps[platform]
+                                                                        ?.get(expression.field)
+                                                                        ?? expression.field }
+                                                                </strong>
                                                             </Table.Cell>
                                                             <Table.Cell>
                                                                 <Label size="small" color="blue" basic>
-                                                                    { OPERATOR_DISPLAY_NAMES[expression.operator]
+                                                                    { platformOperatorMaps[platform]
+                                                                        ?.get(expression.operator)
                                                                         ?? expression.operator }
                                                                 </Label>
                                                             </Table.Cell>
@@ -220,7 +282,7 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
                     };
                 }
             ),
-        [ platformRules ]
+        [ platformRules, platformFieldMaps, platformOperatorMaps ]
     );
 
     return (

@@ -52,7 +52,6 @@ export interface DevicePolicyExpressionValueInterface {
 
 export interface DevicePolicyExpressionInterface {
     field: string;
-    displayName: string;
     operator: string;
     value: DevicePolicyExpressionValueInterface;
 }

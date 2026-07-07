@@ -64,7 +64,7 @@ import {
     PlatformDefinitionInterface,
     PolicyResourceRequestInterface
 } from "../models/device-policy";
-import { buildFlatRule, mapToConditionsMeta } from "../utils/device-policy-rule-utils";
+import { buildFieldDisplayMap, buildFlatRule, mapToConditionsMeta } from "../utils/device-policy-rule-utils";
 
 interface CreateDevicePolicyWizardPropsInterface extends IdentifiableComponentInterface {
     onClose: () => void;
@@ -174,6 +174,23 @@ const CreateDevicePolicyWizard: FunctionComponent<CreateDevicePolicyWizardPropsI
             return mapToConditionsMeta(allRawMeta[activePlatform] ?? []);
         },
         [ activePlatform, allRawMeta ]
+    );
+
+    const platformFieldDisplayMaps: Partial<Record<DevicePlatformType, Map<string, string>>> = useMemo(
+        (): Partial<Record<DevicePlatformType, Map<string, string>>> => {
+            const result: Partial<Record<DevicePlatformType, Map<string, string>>> = {};
+
+            ([ "android", "ios", "macos", "windows" ] as DevicePlatformType[]).forEach(
+                (p: DevicePlatformType): void => {
+                    if (allRawMeta[p]) {
+                        result[p] = buildFieldDisplayMap(allRawMeta[p]);
+                    }
+                }
+            );
+
+            return result;
+        },
+        [ allRawMeta ]
     );
 
     /* -- Handlers ------------------------------------------------------ */
@@ -526,6 +543,7 @@ const CreateDevicePolicyWizard: FunctionComponent<CreateDevicePolicyWizardPropsI
                         policyName={ policyName }
                         platformRules={ platformRules }
                         platformConfigured={ platformConfigured }
+                        fieldDisplayMap={ platformFieldDisplayMaps }
                         onEditPolicy={ (): void => setCurrentStep(WizardStep.BASIC_DETAILS) }
                         onEditRules={ (): void => setCurrentStep(WizardStep.EXECUTION_RULES) }
                         showAssignHint={ true }

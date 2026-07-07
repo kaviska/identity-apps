@@ -37,6 +37,8 @@ interface PolicyReviewStepPropsInterface extends IdentifiableComponentInterface 
     policyName: string;
     platformRules: Partial<Record<DevicePlatformType, RuleWithoutIdInterface | null>>;
     platformConfigured: Partial<Record<DevicePlatformType, boolean>>;
+    /** Per-platform field-id → displayName map built from metadata. Fallback to raw id when absent. */
+    fieldDisplayMap?: Partial<Record<DevicePlatformType, Map<string, string>>>;
     onEditPolicy?: () => void;
     onEditRules: () => void;
     showAssignHint?: boolean;
@@ -56,6 +58,7 @@ const PolicyReviewStep: FunctionComponent<PolicyReviewStepPropsInterface> = (
         policyName,
         platformRules,
         platformConfigured,
+        fieldDisplayMap,
         onEditPolicy,
         onEditRules,
         showAssignHint
@@ -224,7 +227,9 @@ const PolicyReviewStep: FunctionComponent<PolicyReviewStepPropsInterface> = (
                                                                     fontSize: "inherit"
                                                                 } }
                                                             >
-                                                                { expr.field }
+                                                                { fieldDisplayMap?.[p.key]
+                                                                    ?.get(expr.field)
+                                                                    ?? expr.field }
                                                             </Typography>
                                                             <Typography
                                                                 component="span"

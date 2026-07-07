@@ -58,6 +58,7 @@ import {
     PolicyResourceResponseInterface
 } from "../models/device-policy";
 import {
+    buildFieldDisplayMap,
     buildFlatRule,
     convertApiRuleToRuleFormat,
     mapToConditionsMeta
@@ -206,6 +207,23 @@ const EditDevicePolicyWizard: FunctionComponent<EditDevicePolicyWizardPropsInter
         [ activePlatform, allRawMeta ]
     );
 
+    const platformFieldDisplayMaps: Partial<Record<DevicePlatformType, Map<string, string>>> = useMemo(
+        (): Partial<Record<DevicePlatformType, Map<string, string>>> => {
+            const result: Partial<Record<DevicePlatformType, Map<string, string>>> = {};
+
+            ([ "android", "ios", "macos", "windows" ] as DevicePlatformType[]).forEach(
+                (p: DevicePlatformType): void => {
+                    if (allRawMeta[p]) {
+                        result[p] = buildFieldDisplayMap(allRawMeta[p]);
+                    }
+                }
+            );
+
+            return result;
+        },
+        [ allRawMeta ]
+    );
+
     /* -- Handlers ------------------------------------------------------ */
 
     const saveActivePlatformRule = (): void => {
@@ -349,6 +367,7 @@ const EditDevicePolicyWizard: FunctionComponent<EditDevicePolicyWizardPropsInter
                         policyName={ policyName }
                         platformRules={ platformRules }
                         platformConfigured={ platformConfigured }
+                        fieldDisplayMap={ platformFieldDisplayMaps }
                         onEditRules={ (): void => setCurrentStep(WizardStep.EXECUTION_RULES) }
                         data-componentid={ `${ componentId }-review-step` }
                     />

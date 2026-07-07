@@ -36,6 +36,44 @@ import {
 } from "../models/device-policy";
 
 /**
+ * Builds a field-id → displayName lookup map from metadata.
+ * Falls back to the raw id when a field is not found (caller uses `map.get(id) ?? id`).
+ *
+ * @param fields - Field definitions from the metadata endpoint.
+ */
+export const buildFieldDisplayMap = (
+    fields: DevicePolicyFieldDefinitionInterface[]
+): Map<string, string> =>
+    new Map(
+        (fields ?? []).map(
+            (f: DevicePolicyFieldDefinitionInterface): [ string, string ] => [
+                f.field.name,
+                f.field.displayName
+            ]
+        )
+    );
+
+/**
+ * Builds an operator-id → displayName lookup map from metadata.
+ * Merges operators across all field definitions so a single flat map covers all fields.
+ *
+ * @param fields - Field definitions from the metadata endpoint.
+ */
+export const buildOperatorDisplayMap = (
+    fields: DevicePolicyFieldDefinitionInterface[]
+): Map<string, string> => {
+    const map: Map<string, string> = new Map<string, string>();
+
+    (fields ?? []).forEach((f: DevicePolicyFieldDefinitionInterface): void => {
+        f.operators.forEach((op: { name: string; displayName: string }): void => {
+            map.set(op.name, op.displayName);
+        });
+    });
+
+    return map;
+};
+
+/**
  * Maps device policy field metadata into the format the rules component expects,
  * excluding the `platform` field (handled by the wizard's platform tabs).
  *
