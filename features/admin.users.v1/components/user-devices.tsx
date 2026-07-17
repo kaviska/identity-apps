@@ -30,6 +30,7 @@ import {
     ContentLoader,
     DataTable,
     EmptyPlaceholder,
+    ListLayout,
     TableActionsInterface,
     TableColumnInterface
 } from "@wso2is/react-components";
@@ -45,7 +46,7 @@ import React, {
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { Header, Label, Pagination, PaginationProps, SemanticICONS } from "semantic-ui-react";
+import { DropdownProps, Header, Label, PaginationProps, SemanticICONS } from "semantic-ui-react";
 
 const DEFAULT_LIMIT: number = UIConstants.DEFAULT_RESOURCE_LIST_ITEM_LIMIT;
 
@@ -60,18 +61,17 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
     const { t } = useTranslation();
     const dispatch: Dispatch = useDispatch();
 
-    const [ offset, setOffset ] = useState<number>(0);
+    const [ listItemLimit, setListItemLimit ] = useState<number>(DEFAULT_LIMIT);
+    const [ listOffset, setListOffset ] = useState<number>(0);
 
     const {
         data,
         isLoading,
         error
-    } = useGetDevicesByUserId(user?.id, DEFAULT_LIMIT, offset, !!user?.id);
+    } = useGetDevicesByUserId(user?.id, listItemLimit, listOffset, !!user?.id);
 
     const devices: DeviceResponseInterface[] = data?.devices ?? [];
     const totalResults: number = data?.totalResults ?? 0;
-    const totalPages: number = Math.ceil(totalResults / DEFAULT_LIMIT);
-    const activePage: number = Math.floor(offset / DEFAULT_LIMIT) + 1;
 
     useEffect((): void => {
         if (!error) {
@@ -85,8 +85,13 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
         }));
     }, [ error ]);
 
-    const handlePageChange = (_e: MouseEvent<HTMLAnchorElement>, paginationData: PaginationProps): void => {
-        setOffset(((paginationData.activePage as number) - 1) * DEFAULT_LIMIT);
+    const handlePaginationChange = (_e: MouseEvent<HTMLAnchorElement>, paginationData: PaginationProps): void => {
+        setListOffset(((paginationData.activePage as number) - 1) * listItemLimit);
+    };
+
+    const handleItemsPerPageDropdownChange = (_e: SyntheticEvent<HTMLElement>, dropdownData: DropdownProps): void => {
+        setListItemLimit(dropdownData.value as number);
+        setListOffset(0);
     };
 
     const resolveStatusLabel = (status: string): ReactElement => {
@@ -170,7 +175,19 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
     }
 
     return (
-        <>
+        <ListLayout
+            activePage={ Math.floor(listOffset / listItemLimit) + 1 }
+            currentListSize={ devices.length }
+            isLoading={ isLoading }
+            listItemLimit={ listItemLimit }
+            onItemsPerPageDropdownChange={ handleItemsPerPageDropdownChange }
+            onPageChange={ handlePaginationChange }
+            showPagination={ totalResults > 0 }
+            showPaginationPageLimit={ true }
+            totalListSize={ totalResults }
+            totalPages={ Math.ceil(totalResults / listItemLimit) }
+            data-componentid={ `${ componentId }-list-layout` }
+        >
             <DataTable<DeviceResponseInterface>
                 className="user-devices-table"
                 isLoading={ isLoading }
@@ -197,16 +214,7 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
                 transparent={ !isLoading && devices.length === 0 }
                 data-componentid={ componentId }
             />
-            { totalPages > 1 && (
-                <Pagination
-                    activePage={ activePage }
-                    totalPages={ totalPages }
-                    onPageChange={ handlePageChange }
-                    floated="right"
-                    data-componentid={ `${ componentId }-pagination` }
-                />
-            ) }
-        </>
+        </ListLayout>
     );
 };
 
