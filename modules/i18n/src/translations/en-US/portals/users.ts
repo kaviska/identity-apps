@@ -504,6 +504,10 @@ export const users: usersNS = {
                 deviceName: "Device",
                 registeredAt: "Registered At",
                 status: "Status"
+            },
+            status: {
+                active: "Active",
+                pending: "Pending"
             }
         },
         notifications: {

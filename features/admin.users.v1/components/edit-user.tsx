@@ -45,7 +45,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { Divider, Grid, TabProps } from "semantic-ui-react";
 import { ShareUserForm } from "./share-user-form";
-import UserDevices from "./user-devices";
+import { UserDevices } from "./user-devices";
 import { UserGroupsList } from "./user-groups-edit";
 import { UserProfile } from "./user-profile";
 import { UserRolesList } from "./user-roles-list";

@@ -717,7 +717,7 @@ const RuleConditions: FunctionComponent<RulesComponentPropsInterface> = ({
             );
         }
 
-        if (metaValue?.inputType?.toLowerCase() === "input" || null) {
+        if (metaValue?.inputType === "input" || null) {
             return (
                 <TextField
                     disabled={ readonly }
@@ -737,7 +737,7 @@ const RuleConditions: FunctionComponent<RulesComponentPropsInterface> = ({
             );
         }
 
-        if (metaValue?.inputType?.toLowerCase() === "options") {
+        if (metaValue?.inputType === "options") {
             if (metaValue?.values?.length > 1) {
 
                 // Set first value of the list if option is empty

@@ -54,7 +54,7 @@ interface UserDevicesPropsInterface extends IdentifiableComponentInterface {
     user: ProfileInfoInterface;
 }
 
-const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
+export const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
     user,
     "data-componentid": componentId = "user-devices"
 }: UserDevicesPropsInterface): ReactElement => {
@@ -83,7 +83,7 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
             level: AlertLevels.ERROR,
             message: t("users:userDevices.notifications.fetch.genericError.message")
         }));
-    }, [ error ]);
+    }, [ error, t, dispatch ]);
 
     const handlePaginationChange = (_e: MouseEvent<HTMLAnchorElement>, paginationData: PaginationProps): void => {
         setListOffset(((paginationData.activePage as number) - 1) * listItemLimit);
@@ -94,12 +94,23 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
         setListOffset(0);
     };
 
+    /**
+     * Navigates to the detail view of the given device.
+     *
+     * @param device - The device to view.
+     */
+    const handleDeviceView = (device: DeviceResponseInterface): void => {
+        history.push(AppConstants.getPaths().get("DEVICE_DETAIL").replace(":id", device.id));
+    };
+
     const resolveStatusLabel = (status: string): ReactElement => {
         const colour: "green" | "yellow" | "red" =
             status === "ACTIVE" ? "green" : status === "PENDING" ? "yellow" : "red";
 
         return (
-            <Label color={ colour } size="small">{ status }</Label>
+            <Label color={ colour } size="small">
+                { t(`users:userDevices.list.status.${ status?.toLowerCase() }`, { defaultValue: status }) }
+            </Label>
         );
     };
 
@@ -160,11 +171,7 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
             "data-componentid": `${ componentId }-item-view-button`,
             hidden: (): boolean => false,
             icon: (): SemanticICONS => "eye",
-            onClick: (_e: SyntheticEvent, device: DeviceResponseInterface): void => {
-                history.push(
-                    AppConstants.getPaths().get("DEVICE_DETAIL").replace(":id", device.id)
-                );
-            },
+            onClick: (_e: SyntheticEvent, device: DeviceResponseInterface): void => handleDeviceView(device),
             popupText: (): string => t("common:view"),
             renderer: "semantic-icon"
         }
@@ -184,6 +191,7 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
             onPageChange={ handlePaginationChange }
             showPagination={ totalResults > 0 }
             showPaginationPageLimit={ true }
+            showTopActionPanel={ false }
             totalListSize={ totalResults }
             totalPages={ Math.ceil(totalResults / listItemLimit) }
             data-componentid={ `${ componentId }-list-layout` }
@@ -205,11 +213,7 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
                     />
                 }
                 selectable={ true }
-                onRowClick={ (_e: SyntheticEvent, device: DeviceResponseInterface): void => {
-                    history.push(
-                        AppConstants.getPaths().get("DEVICE_DETAIL").replace(":id", device.id)
-                    );
-                } }
+                onRowClick={ (_e: SyntheticEvent, device: DeviceResponseInterface): void => handleDeviceView(device) }
                 showHeader={ true }
                 transparent={ !isLoading && devices.length === 0 }
                 data-componentid={ componentId }
@@ -217,5 +221,3 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
         </ListLayout>
     );
 };
-
-export default UserDevices;

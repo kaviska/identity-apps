@@ -494,6 +494,10 @@ export interface usersNS {
                 status: string;
                 registeredAt: string;
             };
+            status: {
+                active: string;
+                pending: string;
+            };
         };
         notifications: {
             fetch: {
