@@ -23,7 +23,7 @@ import VisualFlowConstants from "../constants/visual-flow-constants";
 import { ActionTypes } from "../models/actions";
 import { Element, ElementCategories } from "../models/elements";
 import { EventTypes } from "../models/extension";
-import { StepTypes } from "../models/steps";
+import { ExecutionTypes, StepTypes } from "../models/steps";
 import PluginRegistry from "../plugins/plugin-registry";
 
 /**
@@ -158,7 +158,12 @@ const useDeleteExecutionResource = (): void => {
                     actionComponentIds.push(edge.sourceHandle.slice(0,
                         -VisualFlowConstants.FLOW_BUILDER_NEXT_HANDLE_SUFFIX.length));
                     actionNodeIds.push(edge.source);
-                    executionNodeIds.push(edge.target);
+
+                    // DeviceRegistrationExecutor stays in the flow so its validation hook
+                    // can detect the missing OTP factor and surface an error.
+                    if ((node.data?.action as any)?.executor?.name !== ExecutionTypes.DeviceRegistration) {
+                        executionNodeIds.push(edge.target);
+                    }
                 }
             });
         });

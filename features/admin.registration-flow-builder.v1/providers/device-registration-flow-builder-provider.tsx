@@ -70,7 +70,7 @@ const DeviceRegistrationFlowBuilderProvider: FC<DeviceRegistrationFlowBuilderPro
             flowType={ FlowTypes.DEVICE_REGISTRATION }
             screenTypes={ screensList }
             shouldFetchMetadata={ false }
-            validationConfig={ {} }
+            validationConfig={ { isDeviceRegistrationFactorValidationEnabled: true } }
         >
             <FlowContextWrapper>{ children }</FlowContextWrapper>
         </AuthenticationFlowBuilderCoreProvider>

@@ -40,6 +40,11 @@ export interface ValidationConfig {
      * Validates that forms with OTP steps have only one action button (resend button is allowed).
      */
     isOTPButtonValidationEnabled?: boolean;
+    /**
+     * Whether device registration factor validation is enabled.
+     * Validates that a DeviceRegistrationExecutor step is preceded by Email OTP or SMS OTP.
+     */
+    isDeviceRegistrationFactorValidationEnabled?: boolean;
 }
 
 /**

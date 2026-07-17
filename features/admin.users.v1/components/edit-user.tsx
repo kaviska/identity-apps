@@ -45,11 +45,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { Divider, Grid, TabProps } from "semantic-ui-react";
 import { ShareUserForm } from "./share-user-form";
+import UserDevices from "./user-devices";
 import { UserGroupsList } from "./user-groups-edit";
 import { UserProfile } from "./user-profile";
 import { UserRolesList } from "./user-roles-list";
 import { UserSessions } from "./user-sessions";
-import UserDevices from "./user-devices";
 import { AdminAccountTypes, UserFeatureDictionaryKeys, UserManagementConstants } from "../constants";
 import useUserManagement from "../hooks/use-user-management";
 
@@ -139,6 +139,13 @@ export const EditUser: FunctionComponent<EditUserPropsInterface> = (
     );
     const hasSharedAccessUpdatePermission: boolean = useRequiredScopes(
         usersFeatureConfig?.subFeatures?.userSharingV2?.scopes?.update
+    );
+    const devicesFeatureConfig: FeatureAccessConfigInterface = useSelector(
+        (state: AppState) => state.config.ui.features?.devices
+    );
+    const isDevicesEnabled: boolean = devicesFeatureConfig?.enabled ?? false;
+    const hasDevicesReadPermission: boolean = useRequiredScopes(
+        devicesFeatureConfig?.scopes?.read
     );
 
     useEffect(() => {
@@ -340,14 +347,16 @@ export const EditUser: FunctionComponent<EditUserPropsInterface> = (
             });
         }
 
-        _panes.push({
-            menuItem: t("users:editUser.tab.menuItems.5"),
-            render: () => (
-                <ResourceTab.Pane controlledSegmentation attached={ false }>
-                    <UserDevices user={ user } />
-                </ResourceTab.Pane>
-            )
-        });
+        if (isDevicesEnabled && hasDevicesReadPermission) {
+            _panes.push({
+                menuItem: t("users:editUser.tab.menuItems.5"),
+                render: () => (
+                    <ResourceTab.Pane controlledSegmentation attached={ false }>
+                        <UserDevices user={ user } />
+                    </ResourceTab.Pane>
+                )
+            });
+        }
 
         return _panes;
     }, [
@@ -356,6 +365,8 @@ export const EditUser: FunctionComponent<EditUserPropsInterface> = (
         isSharedAccessEnabled,
         hasSharedAccessReadPermission,
         hasSharedAccessUpdatePermission,
+        isDevicesEnabled,
+        hasDevicesReadPermission,
         connectorProperties,
         isSuperAdminIdentifierFetchRequestLoading,
         hideTermination,

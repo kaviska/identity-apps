@@ -42,6 +42,8 @@ class RegistrationFlowExecutorConstants {
     public static readonly GOOGLE_EXECUTOR: string = "GoogleExecutor";
 
     public static readonly MAGIC_LINK_EXECUTOR: string = "MagicLinkExecutor";
+
+    public static readonly DEVICE_REGISTRATION_EXECUTOR: string = "DeviceRegistrationExecutor";
 }
 
 export default RegistrationFlowExecutorConstants;

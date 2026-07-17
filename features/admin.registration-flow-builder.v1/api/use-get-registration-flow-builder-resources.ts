@@ -62,6 +62,11 @@ const useGetRegistrationFlowBuilderResources = <Data = Resources, Error = Reques
 
         const deviceRegistrationTemplateTypes: Set<string> = new Set([
             TemplateTypes.Blank,
+            TemplateTypes.DeviceRegistrationEmailOTP,
+            TemplateTypes.DeviceRegistrationSMSOTP
+        ]);
+
+        const deviceRegistrationOnlyTypes: Set<string> = new Set([
             TemplateTypes.BasicDeviceRegister,
             TemplateTypes.DeviceRegistrationEmailOTP,
             TemplateTypes.DeviceRegistrationSMSOTP
@@ -109,7 +114,9 @@ const useGetRegistrationFlowBuilderResources = <Data = Resources, Error = Reques
             ],
             templates: [
                 ...(coreResources?.templates ?? []),
-                ...filteredTemplates
+                ...filteredTemplates.filter(
+                    (template: Template) => !deviceRegistrationOnlyTypes.has(template?.type)
+                )
             ],
             widgets: [
                 ...(coreResources?.widgets ?? []),

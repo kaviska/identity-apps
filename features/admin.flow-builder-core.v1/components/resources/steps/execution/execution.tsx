@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import ExecutionMinimal from "./execution-minimal";
 import VisualFlowConstants from "../../../../constants/visual-flow-constants";
 import useAuthenticationFlowBuilderCore from "../../../../hooks/use-authentication-flow-builder-core-context";
+import useDeviceRegistrationValidation from "../../../../hooks/use-device-registration-validation";
 import useValidationStatus from "../../../../hooks/use-validation-status";
 import Notification, { NotificationType } from "../../../../models/notification";
 import { ExecutionStepViewTypes, ExecutionTypes, Step } from "../../../../models/steps";
@@ -51,6 +52,8 @@ const Execution: FC<ExecutionPropsInterface> = memo(({
         addNotification, removeNotification, setOpenValidationPanel, setSelectedNotification
     } = useValidationStatus();
     const { t } = useTranslation();
+
+    useDeviceRegistrationValidation(id, (data?.action as any)?.executor?.name);
 
     const components: Element[] = data?.components as Element[] || [];
 

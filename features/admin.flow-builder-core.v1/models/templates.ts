@@ -33,5 +33,6 @@ export enum TemplateTypes {
     BasicPasskey = "BASIC_PASSKEY",
     Default = "DEFAULT",
     DeviceRegistrationEmailOTP = "DEVICE_REGISTRATION_EMAIL_OTP",
-    DeviceRegistrationSMSOTP = "DEVICE_REGISTRATION_SMS_OTP"
+    DeviceRegistrationSMSOTP = "DEVICE_REGISTRATION_SMS_OTP",
+    BasicWithDeviceRegister = "BASIC_WITH_DEVICE_REGISTER"
 }
