@@ -18,5 +18,4 @@
 
 export interface DevicesResourceEndpointsInterface {
     devices: string;
-    userDevices: string;
 }

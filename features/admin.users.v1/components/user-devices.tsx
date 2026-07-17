@@ -16,6 +16,7 @@
  * under the License.
  */
 
+import { UIConstants } from "@wso2is/admin.core.v1/constants/ui-constants";
 import { AppConstants } from "@wso2is/admin.core.v1/constants/app-constants";
 import { getEmptyPlaceholderIllustrations } from "@wso2is/admin.core.v1/configs/ui";
 import { history } from "@wso2is/admin.core.v1/helpers/history";
@@ -34,15 +35,19 @@ import {
 } from "@wso2is/react-components";
 import React, {
     FunctionComponent,
+    MouseEvent,
     ReactElement,
     ReactNode,
     SyntheticEvent,
-    useEffect
+    useEffect,
+    useState
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { Header, Label, SemanticICONS } from "semantic-ui-react";
+import { Header, Label, Pagination, PaginationProps, SemanticICONS } from "semantic-ui-react";
+
+const DEFAULT_LIMIT: number = UIConstants.DEFAULT_RESOURCE_LIST_ITEM_LIMIT;
 
 interface UserDevicesPropsInterface extends IdentifiableComponentInterface {
     user: ProfileInfoInterface;
@@ -55,11 +60,18 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
     const { t } = useTranslation();
     const dispatch: Dispatch = useDispatch();
 
+    const [ offset, setOffset ] = useState<number>(0);
+
     const {
-        data: devices,
+        data,
         isLoading,
         error
-    } = useGetDevicesByUserId(user?.id, !!user?.id);
+    } = useGetDevicesByUserId(user?.id, DEFAULT_LIMIT, offset, !!user?.id);
+
+    const devices: DeviceResponseInterface[] = data?.devices ?? [];
+    const totalResults: number = data?.totalResults ?? 0;
+    const totalPages: number = Math.ceil(totalResults / DEFAULT_LIMIT);
+    const activePage: number = Math.floor(offset / DEFAULT_LIMIT) + 1;
 
     useEffect((): void => {
         if (!error) {
@@ -72,6 +84,10 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
             message: t("users:userDevices.notifications.fetch.genericError.message")
         }));
     }, [ error ]);
+
+    const handlePageChange = (_e: MouseEvent<HTMLAnchorElement>, paginationData: PaginationProps): void => {
+        setOffset(((paginationData.activePage as number) - 1) * DEFAULT_LIMIT);
+    };
 
     const resolveStatusLabel = (status: string): ReactElement => {
         const colour: "green" | "yellow" | "red" =
@@ -149,37 +165,48 @@ const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
         }
     ];
 
-    if (isLoading) {
+    if (isLoading && devices.length === 0) {
         return <ContentLoader />;
     }
 
     return (
-        <DataTable<DeviceResponseInterface>
-            className="user-devices-table"
-            isLoading={ isLoading }
-            actions={ resolveTableActions() }
-            columns={ resolveTableColumns() }
-            data={ devices ?? [] }
-            placeholders={
-                <EmptyPlaceholder
-                    className="list-placeholder mr-0"
-                    image={ getEmptyPlaceholderIllustrations().newList }
-                    imageSize="tiny"
-                    subtitle={ [ t("users:userDevices.placeholders.empty.subtitles.0") ] }
-                    title={ t("users:userDevices.placeholders.empty.title") }
-                    data-componentid={ `${ componentId }-empty-placeholder` }
+        <>
+            <DataTable<DeviceResponseInterface>
+                className="user-devices-table"
+                isLoading={ isLoading }
+                actions={ resolveTableActions() }
+                columns={ resolveTableColumns() }
+                data={ devices }
+                placeholders={
+                    <EmptyPlaceholder
+                        className="list-placeholder mr-0"
+                        image={ getEmptyPlaceholderIllustrations().newList }
+                        imageSize="tiny"
+                        subtitle={ [ t("users:userDevices.placeholders.empty.subtitles.0") ] }
+                        title={ t("users:userDevices.placeholders.empty.title") }
+                        data-componentid={ `${ componentId }-empty-placeholder` }
+                    />
+                }
+                selectable={ true }
+                onRowClick={ (_e: SyntheticEvent, device: DeviceResponseInterface): void => {
+                    history.push(
+                        AppConstants.getPaths().get("DEVICE_DETAIL").replace(":id", device.id)
+                    );
+                } }
+                showHeader={ true }
+                transparent={ !isLoading && devices.length === 0 }
+                data-componentid={ componentId }
+            />
+            { totalPages > 1 && (
+                <Pagination
+                    activePage={ activePage }
+                    totalPages={ totalPages }
+                    onPageChange={ handlePageChange }
+                    floated="right"
+                    data-componentid={ `${ componentId }-pagination` }
                 />
-            }
-            selectable={ true }
-            onRowClick={ (_e: SyntheticEvent, device: DeviceResponseInterface): void => {
-                history.push(
-                    AppConstants.getPaths().get("DEVICE_DETAIL").replace(":id", device.id)
-                );
-            } }
-            showHeader={ true }
-            transparent={ !isLoading && (!devices || devices.length === 0) }
-            data-componentid={ componentId }
-        />
+            ) }
+        </>
     );
 };
 

@@ -26,7 +26,6 @@ import { DevicesResourceEndpointsInterface } from "../models/endpoints";
  */
 export const getDevicesResourceEndpoints = (serverHost: string): DevicesResourceEndpointsInterface => {
     return {
-        devices: `${ serverHost }/api/server/v1/devices`,
-        userDevices: `${ serverHost }/api/server/v1/devices/user`
+        devices: `${ serverHost }/api/server/v1/devices`
     };
 };

@@ -466,7 +466,6 @@ export class AppConstants {
                 `${ AppConstants.getDeveloperViewBasePath() }/edit-invited-user-registration-flow` ],
             [ "AGENTS", `${AppConstants.getAdminViewBasePath()}/agents` ],
             [ "AGENT_EDIT", `${ AppConstants.getDeveloperViewBasePath() }/agents/:id` ],
-            [ "DEVICES", `${ AppConstants.getAdminViewBasePath() }/devices` ],
             [ "DEVICE_ASSURANCE_POLICIES",
                 `${ AppConstants.getAdminViewBasePath() }/login-and-registration/device-assurance-policies` ],
             [ "DEVICE_POLICY_EDIT",

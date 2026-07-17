@@ -523,13 +523,6 @@ export class RouteUtils {
             },
             {
                 category: manage,
-                id: "devices",
-                order: 0,
-                parent: deviceManagement,
-                selected: history.location.pathname === AppConstants.getPaths().get("DEVICES")
-            },
-            {
-                category: manage,
                 id: "deviceAssurancePolicies",
                 order: 1,
                 parent: deviceManagement,

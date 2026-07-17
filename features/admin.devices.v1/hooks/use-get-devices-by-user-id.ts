@@ -19,29 +19,38 @@
 import useRequest, { RequestErrorInterface, RequestResultInterface } from "@wso2is/admin.core.v1/hooks/use-request";
 import { store } from "@wso2is/admin.core.v1/store";
 import { HttpMethods } from "@wso2is/core/models";
-import { DeviceResponseInterface } from "../models/devices";
+import { DeviceListResponseInterface } from "../models/devices";
 
 /**
- * Hook to fetch all devices registered to a specific user.
+ * Hook to fetch registered devices for a specific user with server-side pagination.
  *
- * @param userId - The UUID of the user.
+ * @param userId - The ID of the user whose devices to retrieve.
+ * @param limit - Maximum number of devices to return per page.
+ * @param offset - Number of records to skip (zero-based).
  * @param shouldFetch - Whether to trigger the request.
- * @returns SWR result containing the device list.
+ * @returns SWR result containing the paginated device list.
  */
 const useGetDevicesByUserId = (
     userId: string,
+    limit: number = 10,
+    offset: number = 0,
     shouldFetch: boolean = true
-): RequestResultInterface<DeviceResponseInterface[], RequestErrorInterface> => {
-    const requestConfig: { url: string; method: string; headers: Record<string, string> } = {
-        headers: { "Content-Type": "application/json" },
-        method: HttpMethods.GET,
-        url: `${ store.getState().config.endpoints.userDevices }/${ userId }`
-    };
+): RequestResultInterface<DeviceListResponseInterface, RequestErrorInterface> => {
+    const baseUrl: string = store.getState().config.endpoints.devices;
+
+    const requestConfig: { url: string; method: string; headers: Record<string, string> } | null =
+        shouldFetch && userId
+            ? {
+                headers: { "Content-Type": "application/json" },
+                method: HttpMethods.GET,
+                url: `${ baseUrl }?userId=${ encodeURIComponent(userId) }&limit=${ limit }&offset=${ offset }`
+            }
+            : null;
 
     const { data, isLoading, isValidating, error, mutate } = useRequest<
-        DeviceResponseInterface[],
+        DeviceListResponseInterface,
         RequestErrorInterface
-    >(shouldFetch && userId ? requestConfig : null);
+    >(requestConfig);
 
     return { data, error, isLoading, isValidating, mutate };
 };

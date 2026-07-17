@@ -27,6 +27,19 @@ export interface DeviceResponseInterface {
     metadata?: string;
 }
 
+export interface DeviceListLinkInterface {
+    href: string;
+    rel: string;
+}
+
+export interface DeviceListResponseInterface {
+    totalResults: number;
+    startIndex: number;
+    count: number;
+    devices: DeviceResponseInterface[];
+    links?: DeviceListLinkInterface[];
+}
+
 export interface DevicePatchRequestInterface {
     deviceName: string;
 }
