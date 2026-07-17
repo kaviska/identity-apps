@@ -72,7 +72,7 @@ const FlowList: FunctionComponent<FlowListProps> = ({
             case FlowTypes.REGISTRATION:
                 return <UserPlusIcon size="small" className="icon" />;
             case FlowTypes.DEVICE_REGISTRATION:
-                return <UserFlowIcon size="small" className="icon" />;
+                return <UserKeyIcon size="small" className="icon" />;
             case FlowTypes.PASSWORD_RECOVERY:
                 return <UserFlowIcon size="small" className="icon" />;
             case FlowTypes.INVITED_USER_REGISTRATION:
