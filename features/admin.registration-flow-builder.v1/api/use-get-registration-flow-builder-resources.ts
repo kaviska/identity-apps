@@ -77,30 +77,24 @@ const useGetRegistrationFlowBuilderResources = <Data = Resources, Error = Reques
         });
 
         const deviceRegistrationPanelStepLabels: Set<string> = new Set([
+            "Blank View",
             "Email OTP View",
             "SMS OTP View"
         ]);
 
-        const deviceRegistrationSteps: any[] = (steps as any[]).filter((step: any) => {
-            return deviceRegistrationPanelStepLabels.has(step?.display?.label);
-        });
-
         if (flowType === FlowTypes.DEVICE_REGISTRATION) {
-            // Keep all core steps for node-type registration but only show Blank View in panel.
+            // Show only Blank, Email OTP and SMS OTP views (all provided by core) in the panel.
             const coreStepsWithPanelVisibility: any[] = (coreResources?.steps ?? []).map((step: any) => ({
                 ...step,
                 display: {
                     ...step.display,
-                    showOnResourcePanel: step?.display?.label === "Blank View"
+                    showOnResourcePanel: deviceRegistrationPanelStepLabels.has(step?.display?.label)
                 }
             }));
 
             return {
                 ...coreResources,
-                steps: [
-                    ...coreStepsWithPanelVisibility,
-                    ...deviceRegistrationSteps
-                ],
+                steps: coreStepsWithPanelVisibility,
                 templates: deviceRegistrationTemplates,
                 widgets: deviceRegistrationWidgets
             };
