@@ -23,8 +23,8 @@ import { FlowTypes } from "@wso2is/admin.flows.v1/models/flows";
 import { IdentifiableComponentInterface } from "@wso2is/core/models";
 import React, { FunctionComponent, PropsWithChildren, ReactElement } from "react";
 import { useTranslation } from "react-i18next";
-import RegistrationFlowBuilder from "../components/registration-flow-builder";
-import useRegistrationFlowBuilder from "../hooks/use-registration-flow-builder";
+import DeviceRegistrationFlowBuilder from "../components/device-registration-flow-builder";
+import useDeviceRegistrationFlowBuilder from "../hooks/use-device-registration-flow-builder";
 import DeviceRegistrationFlowBuilderProvider from "../providers/device-registration-flow-builder-provider";
 
 /**
@@ -43,7 +43,7 @@ const DeviceRegistrationFlowBuilderPageWithContext: FunctionComponent<DeviceRegi
     children
 }: DeviceRegistrationFlowBuilderPageProps): ReactElement => {
     const { t } = useTranslation();
-    const { isPublishing, onPublish } = useRegistrationFlowBuilder();
+    const { isPublishing, onPublish } = useDeviceRegistrationFlowBuilder();
     const { setRefetchFlow } = useAuthenticationFlowBuilderCore();
 
     return (
@@ -71,7 +71,7 @@ const DeviceRegistrationFlowBuilderPage: FunctionComponent<DeviceRegistrationFlo
 }: DeviceRegistrationFlowBuilderPageProps): ReactElement => (
     <DeviceRegistrationFlowBuilderProvider>
         <DeviceRegistrationFlowBuilderPageWithContext data-componentid={ componentId }>
-            <RegistrationFlowBuilder flowType={ FlowTypes.DEVICE_REGISTRATION } />
+            <DeviceRegistrationFlowBuilder flowType={ FlowTypes.DEVICE_REGISTRATION } />
         </DeviceRegistrationFlowBuilderPageWithContext>
     </DeviceRegistrationFlowBuilderProvider>
 );

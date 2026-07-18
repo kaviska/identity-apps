@@ -260,7 +260,7 @@ export const getAppViewRoutes = (): RouteInterface[] => {
                 },
                 {
                     component: lazy(() => import(
-                        "@wso2is/admin.registration-flow-builder.v1/pages/device-registration-flow-builder-page")),
+                        "@wso2is/admin.device-registration-flow-builder.v1/pages/device-registration-flow-builder-page")),
                     exact: true,
                     id: "deviceRegistrationFlowBuilder",
                     name: "Device Registration Flow Builder",

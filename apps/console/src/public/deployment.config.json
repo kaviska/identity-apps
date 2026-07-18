@@ -986,10 +986,16 @@
                 "featureFlags": [],
                 "scopes": {
                     "create": [],
-                    "delete": [],
+                    "delete": [
+                        "internal_user_mgt_delete"
+                    ],
                     "feature": [],
-                    "read": [],
-                    "update": []
+                    "read": [
+                        "internal_user_mgt_delete"
+                    ],
+                    "update": [
+                        "internal_user_mgt_delete"
+                    ]
                 }
             },
             "dynamicClientRegistration": {

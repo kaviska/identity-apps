@@ -59,6 +59,9 @@ import {
 import {
     getRegistrationFlowBuilderResourceEndpoints
 } from "@wso2is/admin.registration-flow-builder.v1/config/endpoints";
+import {
+    getDeviceRegistrationFlowBuilderResourceEndpoints
+} from "@wso2is/admin.device-registration-flow-builder.v1/config/endpoints";
 import { getRemoteFetchConfigResourceEndpoints } from "@wso2is/admin.remote-repository-configuration.v1";
 import { getRolesResourceEndpoints } from "@wso2is/admin.roles.v2/configs/endpoints";
 import { getRulesEndpoints } from "@wso2is/admin.rules.v1/configs/endpoints";
@@ -377,6 +380,7 @@ export class Config {
             ...getWorkflowAssociationsResourceEndpoints(this.resolveServerHost()),
             ...getWorkflowRequestsResourceEndpoints(this.resolveServerHost()),
             ...getRegistrationFlowBuilderResourceEndpoints(this.resolveServerHost()),
+            ...getDeviceRegistrationFlowBuilderResourceEndpoints(this.resolveServerHost()),
             ...getPasswordRecoveryFlowBuilderResourceEndpoints(this.resolveServerHost()),
             ...getAskPasswordFlowBuilderResourceEndpoints(this.resolveServerHost()),
             ...getFlowsResourceEndpoints(this.resolveServerHost()),

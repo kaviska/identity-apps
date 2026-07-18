@@ -31,12 +31,12 @@ import React, { FC, PropsWithChildren, ReactElement, useMemo, useState } from "r
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import configureRegistrationFlow from "../api/configure-registration-flow";
+import configureDeviceRegistrationFlow from "../api/configure-device-registration-flow";
 import useGetSupportedProfileAttributes from "../api/use-get-supported-profile-attributes";
 import ResourceProperties from "../components/resource-property-panel/resource-properties";
 import ElementFactory from "../components/resources/elements/element-factory";
 import DeviceRegistrationFlowConstants from "../constants/device-registration-flow-constants";
-import RegistrationFlowBuilderContext from "../context/registration-flow-builder-context";
+import DeviceRegistrationFlowBuilderContext from "../context/device-registration-flow-builder-context";
 import { Attribute } from "../models/attributes";
 import transformFlow from "../utils/transform-flow";
 
@@ -123,7 +123,7 @@ const FlowContextWrapper: FC<DeviceRegistrationFlowBuilderProviderProps> = ({
 
             deviceRegistrationFlow.flowType = DeviceRegistrationFlowConstants.DEVICE_REGISTRATION_FLOW_TYPE;
 
-            await configureRegistrationFlow(deviceRegistrationFlow);
+            await configureDeviceRegistrationFlow(deviceRegistrationFlow);
 
             dispatch(
                 addAlert({
@@ -157,7 +157,7 @@ const FlowContextWrapper: FC<DeviceRegistrationFlowBuilderProviderProps> = ({
     };
 
     return (
-        <RegistrationFlowBuilderContext.Provider
+        <DeviceRegistrationFlowBuilderContext.Provider
             value={ {
                 isPublishing,
                 onPublish: handlePublish,
@@ -167,7 +167,7 @@ const FlowContextWrapper: FC<DeviceRegistrationFlowBuilderProviderProps> = ({
             } }
         >
             { children }
-        </RegistrationFlowBuilderContext.Provider>
+        </DeviceRegistrationFlowBuilderContext.Provider>
     );
 };
 

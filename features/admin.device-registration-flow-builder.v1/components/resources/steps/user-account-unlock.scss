@@ -16,13 +16,26 @@
  * under the License.
  */
 
-class DeviceRegistrationFlowConstants {
-    /**
-     * Private constructor to avoid object instantiation from outside the class.
-     */
-    private constructor() {}
-
-    public static readonly DEVICE_REGISTRATION_FLOW_TYPE: string = "DEVICE_REGISTRATION";
+ :root {
+    --wso2is-flow-builder-end-step-icon-color: var(--oxygen-customComponents-Chip-properties-new-border-color);;
 }
 
-export default DeviceRegistrationFlowConstants;
+.user-account-unlock.MuiFab-root {
+    pointer-events: none;
+    box-shadow: none;
+    color: var(--oxygen-palette-common-white);
+    background-color: rgba(0, 0, 0, 0);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(131deg, rgba(117, 237, 161, 0.70) 28.46%, rgb(52 146 86 / 60%) 119.09%);
+
+    svg {
+        path {
+            stroke: var(--wso2is-flow-builder-end-step-icon-color);
+        }
+    }
+}
