@@ -16,7 +16,6 @@
  * under the License.
  */
 
-import { DocumentCheckIcon, GearIcon, ShieldCheckIcon } from "@oxygen-ui/react-icons";
 import Box from "@oxygen-ui/react/Box";
 import Typography from "@oxygen-ui/react/Typography";
 import { getTechnologyLogos } from "@wso2is/admin.core.v1/configs/ui";
@@ -55,6 +54,9 @@ import {
 } from "semantic-ui-react";
 import PolicyReviewStep from "./steps/policy-review-step";
 import PolicyRulesStep from "./steps/policy-rules-step";
+import { ReactComponent as DocumentIcon } from "../../themes/default/assets/images/icons/document-icon.svg";
+import { ReactComponent as GearsIcon } from "../../themes/default/assets/images/icons/gears-icon.svg";
+import { ReactComponent as ShieldIcon } from "../../themes/default/assets/images/icons/lock-shield.svg";
 import { createDevicePolicy } from "../api/device-policies";
 import useGetDevicePolicyMetadata from "../hooks/use-get-device-policy-metadata";
 import {
@@ -419,15 +421,15 @@ const CreateDevicePolicyWizard: FunctionComponent<CreateDevicePolicyWizardPropsI
 
     const WIZARD_STEPS: { icon: FunctionComponent<SVGProps<SVGSVGElement>>; title: string }[] = [
         {
-            icon: ShieldCheckIcon,
+            icon: ShieldIcon,
             title: t("devices:assurancePolicies.wizard.steps.platform.title")
         },
         {
-            icon: GearIcon,
+            icon: GearsIcon,
             title: t("devices:assurancePolicies.wizard.steps.executionRules.title")
         },
         {
-            icon: DocumentCheckIcon,
+            icon: DocumentIcon,
             title: t("devices:assurancePolicies.wizard.steps.review.title")
         }
     ];
