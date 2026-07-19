@@ -61,6 +61,7 @@ const DeviceAssurancePoliciesPage: FunctionComponent<DeviceAssurancePoliciesPage
     const devicePoliciesFeatureConfig: FeatureAccessConfigInterface = useSelector(
         (state: AppState) => state.config.ui.features?.devicePolicies
     );
+    const hasReadPermission: boolean = useRequiredScopes(devicePoliciesFeatureConfig?.scopes?.read);
     const hasCreatePermission: boolean = useRequiredScopes(devicePoliciesFeatureConfig?.scopes?.create);
 
     const [ listItemLimit, setListItemLimit ] = useState<number>(UIConstants.DEFAULT_RESOURCE_LIST_ITEM_LIMIT);
@@ -74,7 +75,7 @@ const DeviceAssurancePoliciesPage: FunctionComponent<DeviceAssurancePoliciesPage
         isLoading: isPolicyListLoading,
         error: policyListFetchError,
         mutate: mutatePolicyList
-    } = useGetDevicePolicies(listItemLimit, listOffset, searchQuery || undefined);
+    } = useGetDevicePolicies(listItemLimit, listOffset, searchQuery || undefined, hasReadPermission);
 
     useEffect((): void => {
         if (!policyListFetchError) {

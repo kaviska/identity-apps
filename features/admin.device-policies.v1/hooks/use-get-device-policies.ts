@@ -36,7 +36,8 @@ import { PolicyListResponseInterface } from "../models/device-policy";
 export const useGetDevicePolicies = (
     limit?: number,
     offset?: number,
-    filter?: string
+    filter?: string,
+    shouldFetch: boolean = true
 ): RequestResultInterface<PolicyListResponseInterface, RequestErrorInterface> => {
     const requestConfig: RequestConfigInterface = {
         headers: { "Content-Type": "application/json" },
@@ -50,7 +51,7 @@ export const useGetDevicePolicies = (
     };
 
     const { data, error, isLoading, isValidating, mutate } =
-        useRequest<PolicyListResponseInterface, RequestErrorInterface>(requestConfig);
+        useRequest<PolicyListResponseInterface, RequestErrorInterface>(shouldFetch ? requestConfig : null);
 
     return { data, error, isLoading, isValidating, mutate };
 };
