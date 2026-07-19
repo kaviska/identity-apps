@@ -499,8 +499,17 @@ export const users: usersNS = {
         }
     },
     userDevices: {
+        confirmations: {
+            delete: {
+                assertionHint: "Please confirm your action.",
+                content: "This action is irreversible and will permanently delete the device.",
+                header: "Are you sure?",
+                message: "This action is irreversible and will permanently delete the device."
+            }
+        },
         list: {
             columns: {
+                actions: "Actions",
                 deviceName: "Device",
                 registeredAt: "Registered At",
                 status: "Status"
@@ -511,10 +520,30 @@ export const users: usersNS = {
             }
         },
         notifications: {
+            delete: {
+                genericError: {
+                    description: "An error occurred while deleting the device.",
+                    message: "Deletion failed"
+                },
+                success: {
+                    description: "The device was deleted successfully.",
+                    message: "Device deleted"
+                }
+            },
             fetch: {
                 genericError: {
                     description: "An error occurred while retrieving devices for this user.",
                     message: "Retrieval failed"
+                }
+            },
+            update: {
+                genericError: {
+                    description: "An error occurred while renaming the device.",
+                    message: "Update failed"
+                },
+                success: {
+                    description: "The device was renamed successfully.",
+                    message: "Device updated"
                 }
             }
         },
@@ -525,6 +554,11 @@ export const users: usersNS = {
                 },
                 title: "No Devices"
             }
+        },
+        rename: {
+            heading: "Rename Device",
+            nameLabel: "Device name",
+            namePlaceholder: "Enter a name for the device"
         }
     }
 };

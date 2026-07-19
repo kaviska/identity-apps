@@ -488,8 +488,17 @@ export interface usersNS {
         };
     };
     userDevices: {
+        confirmations: {
+            delete: {
+                assertionHint: string;
+                content: string;
+                header: string;
+                message: string;
+            };
+        };
         list: {
             columns: {
+                actions: string;
                 deviceName: string;
                 status: string;
                 registeredAt: string;
@@ -500,10 +509,30 @@ export interface usersNS {
             };
         };
         notifications: {
+            delete: {
+                genericError: {
+                    description: string;
+                    message: string;
+                };
+                success: {
+                    description: string;
+                    message: string;
+                };
+            };
             fetch: {
                 genericError: {
                     message: string;
                     description: string;
+                };
+            };
+            update: {
+                genericError: {
+                    description: string;
+                    message: string;
+                };
+                success: {
+                    description: string;
+                    message: string;
                 };
             };
         };
@@ -514,6 +543,11 @@ export interface usersNS {
                     0: string;
                 };
             };
+        };
+        rename: {
+            heading: string;
+            nameLabel: string;
+            namePlaceholder: string;
         };
     };
 }

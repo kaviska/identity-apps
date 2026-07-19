@@ -16,8 +16,10 @@
  * under the License.
  */
 
+import { FeatureAccessConfigInterface, useRequiredScopes } from "@wso2is/access-control";
 import { AppConstants } from "@wso2is/admin.core.v1/constants/app-constants";
 import { history } from "@wso2is/admin.core.v1/helpers/history";
+import { AppState } from "@wso2is/admin.core.v1/store";
 import { AlertLevels, IdentifiableComponentInterface } from "@wso2is/core/models";
 import { addAlert } from "@wso2is/core/store";
 import {
@@ -29,7 +31,7 @@ import {
 import isEmpty from "lodash-es/isEmpty";
 import React, { FunctionComponent, ReactElement, ReactNode, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { Dispatch } from "redux";
 import { Icon, Label, Table } from "semantic-ui-react";
@@ -61,6 +63,11 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
 
     const dispatch: Dispatch = useDispatch();
     const { t } = useTranslation();
+
+    const devicePoliciesFeatureConfig: FeatureAccessConfigInterface = useSelector(
+        (state: AppState) => state.config.ui.features?.devicePolicies
+    );
+    const hasUpdatePermission: boolean = useRequiredScopes(devicePoliciesFeatureConfig?.scopes?.update);
 
     const [ showEditWizard, setShowEditWizard ] = useState<boolean>(false);
 
@@ -304,7 +311,7 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
                         history.push(AppConstants.getPaths().get("DEVICE_ASSURANCE_POLICIES")),
                     text: t("devices:assurancePolicies.edit.backButton")
                 } }
-                action={ (
+                action={ hasUpdatePermission && (
                     <PrimaryButton
                         disabled={ isPolicyLoading || !policy }
                         onClick={ (): void => setShowEditWizard(true) }

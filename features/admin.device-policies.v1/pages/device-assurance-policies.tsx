@@ -16,10 +16,12 @@
  * under the License.
  */
 
+import { FeatureAccessConfigInterface, useRequiredScopes } from "@wso2is/access-control";
 import { AdvancedSearchWithBasicFilters } from "@wso2is/admin.core.v1/components/advanced-search-with-basic-filters";
 import { UIConstants } from "@wso2is/admin.core.v1/constants/ui-constants";
 import { AppConstants } from "@wso2is/admin.core.v1/constants/app-constants";
 import { history } from "@wso2is/admin.core.v1/helpers/history";
+import { AppState } from "@wso2is/admin.core.v1/store";
 import { AlertLevels, IdentifiableComponentInterface } from "@wso2is/core/models";
 import { addAlert } from "@wso2is/core/store";
 import {
@@ -38,7 +40,7 @@ import React, {
     useState
 } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { DropdownProps, Icon, PaginationProps } from "semantic-ui-react";
 import CreateDevicePolicyWizard from "../components/create-device-policy-wizard";
@@ -55,6 +57,11 @@ const DeviceAssurancePoliciesPage: FunctionComponent<DeviceAssurancePoliciesPage
     const { t } = useTranslation();
     const { getLink } = useDocumentation();
     const dispatch: Dispatch = useDispatch();
+
+    const devicePoliciesFeatureConfig: FeatureAccessConfigInterface = useSelector(
+        (state: AppState) => state.config.ui.features?.devicePolicies
+    );
+    const hasCreatePermission: boolean = useRequiredScopes(devicePoliciesFeatureConfig?.scopes?.create);
 
     const [ listItemLimit, setListItemLimit ] = useState<number>(UIConstants.DEFAULT_RESOURCE_LIST_ITEM_LIMIT);
     const [ listOffset, setListOffset ] = useState<number>(0);
@@ -129,7 +136,7 @@ const DeviceAssurancePoliciesPage: FunctionComponent<DeviceAssurancePoliciesPage
                     </DocumentationLink>
                 </>
             ) }
-            action={ (
+            action={ hasCreatePermission && (
                 <PrimaryButton
                     onClick={ (): void => setShowWizard(true) }
                     data-componentid={ `${ componentId }-add-button` }

@@ -104,6 +104,10 @@ export interface FeatureConfigInterface {
      */
     devices?: FeatureAccessConfigInterface;
     /**
+     * Device assurance policies feature.
+     */
+    devicePolicies?: FeatureAccessConfigInterface;
+    /**
      * Admin user management feature.
      */
     administrators?: FeatureAccessConfigInterface;

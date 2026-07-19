@@ -16,9 +16,11 @@
  * under the License.
  */
 
+import { FeatureAccessConfigInterface, useRequiredScopes } from "@wso2is/access-control";
 import { getEmptyPlaceholderIllustrations } from "@wso2is/admin.core.v1/configs/ui";
 import { AppConstants } from "@wso2is/admin.core.v1/constants/app-constants";
 import { history } from "@wso2is/admin.core.v1/helpers/history";
+import { AppState } from "@wso2is/admin.core.v1/store";
 import { AlertLevels, IdentifiableComponentInterface } from "@wso2is/core/models";
 import { addAlert } from "@wso2is/core/store";
 import {
@@ -33,7 +35,7 @@ import {
 } from "@wso2is/react-components";
 import React, { FunctionComponent, ReactElement, ReactNode, SyntheticEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Header, SemanticICONS } from "semantic-ui-react";
 import { deleteDevicePolicy } from "../api/device-policies";
 import { PolicyListItemInterface } from "../models/device-policy";
@@ -60,6 +62,11 @@ const DevicePolicyList: FunctionComponent<DevicePolicyListPropsInterface> = (
 
     const dispatch: ReturnType<typeof useDispatch> = useDispatch();
     const { t } = useTranslation();
+
+    const devicePoliciesFeatureConfig: FeatureAccessConfigInterface = useSelector(
+        (state: AppState) => state.config.ui.features?.devicePolicies
+    );
+    const hasDeletePermission: boolean = useRequiredScopes(devicePoliciesFeatureConfig?.scopes?.delete);
 
     const [ showDeleteConfirmation, setShowDeleteConfirmation ] = useState<boolean>(false);
     const [ deletingPolicy, setDeletingPolicy ] = useState<PolicyListItemInterface | null>(null);
@@ -136,7 +143,7 @@ const DevicePolicyList: FunctionComponent<DevicePolicyListPropsInterface> = (
     const resolveTableActions = (): TableActionsInterface[] => [
         {
             "data-componentid": `${ componentId }-item-delete-button`,
-            hidden: (): boolean => false,
+            hidden: (): boolean => !hasDeletePermission,
             icon: (): SemanticICONS => "trash alternate",
             onClick: (_e: SyntheticEvent, policy: PolicyListItemInterface): void => {
                 setDeletingPolicy(policy);

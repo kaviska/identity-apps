@@ -143,10 +143,7 @@ export const EditUser: FunctionComponent<EditUserPropsInterface> = (
     const devicesFeatureConfig: FeatureAccessConfigInterface = useSelector(
         (state: AppState) => state.config.ui.features?.devices
     );
-    const isDevicesEnabled: boolean = devicesFeatureConfig?.enabled ?? false;
-    const hasDevicesReadPermission: boolean = useRequiredScopes(
-        devicesFeatureConfig?.scopes?.read
-    );
+    const hasDevicesReadPermission: boolean = useRequiredScopes(devicesFeatureConfig?.scopes?.read);
 
     useEffect(() => {
         if (!isSuperOrganization()) {
@@ -347,7 +344,7 @@ export const EditUser: FunctionComponent<EditUserPropsInterface> = (
             });
         }
 
-        if (isDevicesEnabled && hasDevicesReadPermission) {
+        if (hasDevicesReadPermission) {
             _panes.push({
                 menuItem: t("users:editUser.tab.menuItems.5"),
                 render: () => (
@@ -365,7 +362,6 @@ export const EditUser: FunctionComponent<EditUserPropsInterface> = (
         isSharedAccessEnabled,
         hasSharedAccessReadPermission,
         hasSharedAccessUpdatePermission,
-        isDevicesEnabled,
         hasDevicesReadPermission,
         connectorProperties,
         isSuperAdminIdentifierFetchRequestLoading,

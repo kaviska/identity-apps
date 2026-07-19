@@ -16,6 +16,7 @@
  * under the License.
  */
 
+export * from "./api/devices";
 export * from "./configs/endpoints";
 export { default as useGetDevicesByUserId } from "./hooks/use-get-devices-by-user-id";
 export * from "./models/devices";

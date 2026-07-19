@@ -16,6 +16,7 @@
  * under the License.
  */
 
+import { DocumentCheckIcon, GearIcon } from "@oxygen-ui/react-icons";
 import { getTechnologyLogos } from "@wso2is/admin.core.v1/configs/ui";
 import { ConditionExpressionsMetaDataInterface } from "@wso2is/admin.rules.v1/models/meta";
 import { RuleWithoutIdInterface } from "@wso2is/admin.rules.v1/models/rules";
@@ -46,8 +47,6 @@ import {
 } from "semantic-ui-react";
 import PolicyReviewStep from "./steps/policy-review-step";
 import PolicyRulesStep from "./steps/policy-rules-step";
-import { ReactComponent as DeviceOutlineIcon } from "../assets/icons/device-window-outline.svg";
-import { ReactComponent as SettingsOutlineIcon } from "../assets/icons/settings-outline.svg";
 import { updateDevicePolicy } from "../api/device-policies";
 import useGetDevicePolicyMetadata from "../hooks/use-get-device-policy-metadata";
 import {
@@ -330,11 +329,11 @@ const EditDevicePolicyWizard: FunctionComponent<EditDevicePolicyWizardPropsInter
 
     const WIZARD_STEPS: { icon: FunctionComponent<SVGProps<SVGSVGElement>>; title: string }[] = [
         {
-            icon: SettingsOutlineIcon,
+            icon: GearIcon,
             title: t("devices:assurancePolicies.wizard.steps.executionRules.title")
         },
         {
-            icon: DeviceOutlineIcon,
+            icon: DocumentCheckIcon,
             title: t("devices:assurancePolicies.wizard.steps.review.title")
         }
     ];

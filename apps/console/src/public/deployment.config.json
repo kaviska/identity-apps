@@ -986,10 +986,36 @@
                 "featureFlags": [],
                 "scopes": {
                     "create": [],
-                    "delete": [],
+                    "delete": [
+                        "internal_governance_update"
+                    ],
                     "feature": [],
-                    "read": [],
-                    "update": []
+                    "read": [
+                        "internal_governance_view"
+                    ],
+                    "update": [
+                        "internal_governance_update"
+                    ]
+                }
+            },
+            "devicePolicies": {
+                "disabledFeatures": [],
+                "enabled": true,
+                "featureFlags": [],
+                "scopes": {
+                    "create": [
+                        "internal_governance_update"
+                    ],
+                    "delete": [
+                        "internal_governance_update"
+                    ],
+                    "feature": [],
+                    "read": [
+                        "internal_governance_view"
+                    ],
+                    "update": [
+                        "internal_governance_update"
+                    ]
                 }
             },
             "dynamicClientRegistration": {
