@@ -295,7 +295,7 @@ const EditDevicePolicyWizard: FunctionComponent<EditDevicePolicyWizardPropsInter
                 })
             );
 
-        updateDevicePolicy(policyId, { name: policyName.trim(), resources })
+        updateDevicePolicy(policyId, { resources })
             .then((): void => {
                 dispatch(addAlert({
                     description: t(

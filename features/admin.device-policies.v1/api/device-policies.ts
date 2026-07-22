@@ -23,7 +23,8 @@ import { HttpMethods } from "@wso2is/core/models";
 import { AxiosResponse } from "axios";
 import {
     DevicePolicyResponseInterface,
-    PolicyRequestInterface
+    PolicyRequestInterface,
+    PolicyUpdateRequestInterface
 } from "../models/device-policy";
 
 const httpClient: HttpClientInstance =
@@ -59,7 +60,7 @@ export const createDevicePolicy = (
  */
 export const updateDevicePolicy = (
     policyId: string,
-    payload: PolicyRequestInterface
+    payload: PolicyUpdateRequestInterface
 ): Promise<DevicePolicyResponseInterface> => {
     const requestConfig: RequestConfigInterface = {
         data: payload,

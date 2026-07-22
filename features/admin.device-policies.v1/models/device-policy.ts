@@ -45,6 +45,16 @@ export interface PolicyRequestInterface {
     resources: PolicyResourceRequestInterface[];
 }
 
+/**
+ * Request body for updating a policy.
+ *
+ * The update API only accepts `resources` — the policy name cannot be changed
+ * via this endpoint (see the `PolicyUpdateRequest` schema in the Policy API definition).
+ */
+export interface PolicyUpdateRequestInterface {
+    resources: PolicyResourceRequestInterface[];
+}
+
 export interface DevicePolicyExpressionValueInterface {
     type: string;
     value: string;
