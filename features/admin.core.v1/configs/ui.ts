@@ -63,9 +63,6 @@ import {
 } from "../../themes/default/assets/images/icons/outline-icons/admin-outline.svg";
 import { ReactComponent as AgentOutlineIcon } from "../../themes/default/assets/images/icons/outline-icons/agent.svg";
 import {
-    ReactComponent as DeviceOutlineIcon
-} from "../../themes/default/assets/images/icons/outline-icons/device-outline.svg";
-import {
     ReactComponent as AnalyticsIcon
 } from "../../themes/default/assets/images/icons/outline-icons/analytics.svg";
 import {
@@ -270,7 +267,6 @@ export const getTechnologyLogos = (): GetTechnologyLogosInterface => {
  */
 type GetSidePanelIconsInterface = {
     adminAdvisoryBanner: FunctionComponent | ReactNode,
-    devices: FunctionComponent | ReactNode,
     policyAdministration: FunctionComponent | ReactNode,
     administrators: FunctionComponent | ReactNode,
     apiResources: FunctionComponent | ReactNode,
@@ -323,7 +319,6 @@ export const getSidePanelIcons = (): GetSidePanelIconsInterface => {
         adminAdvisoryBanner: AdminAdvisoryBannerIcon,
         administrators: AdminOutlineIcon,
         agents: AgentOutlineIcon,
-        devices: DeviceOutlineIcon,
         apiResources: CloudConnectionOutlineIcon,
         appLogs: IDPMetadataIcon,
         applicationRoles: ApplicationRolesIcon,
