@@ -16,7 +16,9 @@
  * under the License.
  */
 
+import { ArrowLeftIcon, ArrowRightIcon } from "@oxygen-ui/react-icons";
 import Box from "@oxygen-ui/react/Box";
+import TextField from "@oxygen-ui/react/TextField";
 import Typography from "@oxygen-ui/react/Typography";
 import { getTechnologyLogos } from "@wso2is/admin.core.v1/configs/ui";
 import { ConditionExpressionsMetaDataInterface } from "@wso2is/admin.rules.v1/models/meta";
@@ -45,11 +47,7 @@ import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import {
     Card,
-    Form,
     Grid,
-    Icon,
-    Input,
-    InputOnChangeData,
     Modal
 } from "semantic-ui-react";
 import PolicyReviewStep from "./steps/policy-review-step";
@@ -438,50 +436,30 @@ const CreateDevicePolicyWizard: FunctionComponent<CreateDevicePolicyWizardPropsI
 
     const renderBasicDetailsStep = (): ReactElement => (
         <Box>
-            <Form>
-                <Form.Field required>
-                    <label>
-                        { t("devices:assurancePolicies.wizard.steps.ruleBuilder.policyNameLabel") }
-                    </label>
-                    <Input
-                        fluid
-                        value={ policyName }
-                        placeholder={ t(
-                            "devices:assurancePolicies.wizard.steps.ruleBuilder.policyNamePlaceholder"
-                        ) }
-                        error={ nameError.length > 0 }
-                        onChange={ (
-                            _e: ChangeEvent<HTMLInputElement>,
-                            data: InputOnChangeData
-                        ): void => {
-                            setPolicyName(data.value);
-                            if (nameError) {
-                                setNameError("");
-                            }
-                        } }
-                        data-componentid={ `${ componentId }-policy-name` }
-                    />
-                    { nameError && (
-                        <Typography
-                            variant="caption"
-                            sx={ { color: "error.main", mt: 0.5, display: "block" } }
-                        >
-                            { nameError }
-                        </Typography>
-                    ) }
-                    <Typography variant="caption" sx={ { color: "text.secondary", mt: 0.5, display: "block" } }>
-                        A short, recognizable label. 3–80 characters.
-                    </Typography>
-                </Form.Field>
-            </Form>
+            <TextField
+                fullWidth
+                required
+                label={ t("devices:assurancePolicies.wizard.steps.ruleBuilder.policyNameLabel") }
+                value={ policyName }
+                placeholder={ t(
+                    "devices:assurancePolicies.wizard.steps.ruleBuilder.policyNamePlaceholder"
+                ) }
+                error={ nameError.length > 0 }
+                helperText={ nameError || "A short, recognizable label. 3–80 characters." }
+                onChange={ (e: ChangeEvent<HTMLInputElement>): void => {
+                    setPolicyName(e.target.value);
+                    if (nameError) {
+                        setNameError("");
+                    }
+                } }
+                data-componentid={ `${ componentId }-policy-name` }
+            />
 
             <Box sx={ { mt: 3 } }>
-                <Form.Field required>
-                    <label>
-                        { t("devices:assurancePolicies.wizard.steps.platform.heading") }
-                    </label>
-                </Form.Field>
-                <Typography variant="caption" sx={ { color: "text.secondary", mb: 1.5, display: "block" } }>
+                <Typography variant="body1" sx={ { fontWeight: 500, mb: 0.5 } }>
+                    { t("devices:assurancePolicies.wizard.steps.platform.heading") } *
+                </Typography>
+                <Typography variant="caption" sx={ { color: "text.secondary", display: "block", mb: 1.5 } }>
                     { t("devices:assurancePolicies.wizard.steps.platform.description") }
                 </Typography>
                 <Card.Group itemsPerRow={ 4 } className="platform-selection-cards">
@@ -506,7 +484,7 @@ const CreateDevicePolicyWizard: FunctionComponent<CreateDevicePolicyWizardPropsI
                     )) }
                 </Card.Group>
                 { platformsError && (
-                    <Typography variant="caption" sx={ { color: "error.main", mt: 1, display: "block" } }>
+                    <Typography variant="caption" sx={ { color: "error.main", display: "block", mt: 1 } }>
                         { platformsError }
                     </Typography>
                 ) }
@@ -577,7 +555,7 @@ const CreateDevicePolicyWizard: FunctionComponent<CreateDevicePolicyWizardPropsI
                             ) }
                             data-componentid={ `${ componentId }-back-button` }
                         >
-                            <Icon name="arrow left" />
+                            <ArrowLeftIcon />
                             { t("devices:assurancePolicies.wizard.buttons.back") }
                         </LinkButton>
                     ) }
@@ -588,7 +566,7 @@ const CreateDevicePolicyWizard: FunctionComponent<CreateDevicePolicyWizardPropsI
                             data-componentid={ `${ componentId }-next-button` }
                         >
                             { t("devices:assurancePolicies.wizard.buttons.next") }
-                            <Icon name="arrow right" />
+                            <ArrowRightIcon />
                         </PrimaryButton>
                     ) }
                     { currentStep === WizardStep.EXECUTION_RULES && (
@@ -598,7 +576,7 @@ const CreateDevicePolicyWizard: FunctionComponent<CreateDevicePolicyWizardPropsI
                             data-componentid={ `${ componentId }-review-button` }
                         >
                             { t("devices:assurancePolicies.wizard.buttons.next") }
-                            <Icon name="arrow right" />
+                            <ArrowRightIcon />
                         </PrimaryButton>
                     ) }
                     { currentStep === WizardStep.REVIEW && (

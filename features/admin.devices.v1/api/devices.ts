@@ -19,8 +19,9 @@
 import { AsgardeoSPAClient, HttpClientInstance } from "@asgardeo/auth-react";
 import { RequestConfigInterface } from "@wso2is/admin.core.v1/hooks/use-request";
 import { store } from "@wso2is/admin.core.v1/store";
-import { HttpMethods } from "@wso2is/core/models";
-import { AxiosResponse } from "axios";
+import { IdentityAppsApiException } from "@wso2is/core/exceptions";
+import { HttpErrorResponseDataInterface, HttpMethods } from "@wso2is/core/models";
+import { AxiosError, AxiosResponse } from "axios";
 import { DevicePatchRequestInterface, DeviceResponseInterface } from "../models/devices";
 
 const httpClient: HttpClientInstance =
@@ -32,6 +33,7 @@ const httpClient: HttpClientInstance =
  * @param deviceId - UUID of the device.
  * @param payload - Patch request body.
  * @returns The updated device.
+ * @throws Throws an IdentityAppsApiException if the request fails.
  */
 export const updateDeviceName = (
     deviceId: string,
@@ -40,6 +42,7 @@ export const updateDeviceName = (
     const requestConfig: RequestConfigInterface = {
         data: payload,
         headers: {
+            Accept: "application/json",
             "Content-Type": "application/json"
         },
         method: HttpMethods.PATCH,
@@ -47,8 +50,30 @@ export const updateDeviceName = (
     };
 
     return httpClient(requestConfig)
-        .then((response: AxiosResponse<DeviceResponseInterface>) => Promise.resolve(response.data))
-        .catch((error: unknown) => Promise.reject(error));
+        .then((response: AxiosResponse) => {
+            if (response.status !== 200) {
+                throw new IdentityAppsApiException(
+                    "Failed to update the device. Received an invalid status code.",
+                    null,
+                    response.status,
+                    response.request,
+                    response,
+                    response.config
+                );
+            }
+
+            return Promise.resolve(response.data as DeviceResponseInterface);
+        })
+        .catch((error: AxiosError<HttpErrorResponseDataInterface>) => {
+            throw new IdentityAppsApiException(
+                error.message,
+                error.stack,
+                error.response?.data?.code,
+                error.request,
+                error.response,
+                error.config
+            );
+        });
 };
 
 /**
@@ -56,17 +81,43 @@ export const updateDeviceName = (
  *
  * @param deviceId - UUID of the device.
  * @returns The device.
+ * @throws Throws an IdentityAppsApiException if the request fails.
  */
 export const getDeviceById = (deviceId: string): Promise<DeviceResponseInterface> => {
     const requestConfig: RequestConfigInterface = {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
         method: HttpMethods.GET,
         url: `${ store.getState().config.endpoints.devices }/${ deviceId }`
     };
 
     return httpClient(requestConfig)
-        .then((response: AxiosResponse<DeviceResponseInterface>) => Promise.resolve(response.data))
-        .catch((error: unknown) => Promise.reject(error));
+        .then((response: AxiosResponse) => {
+            if (response.status !== 200) {
+                throw new IdentityAppsApiException(
+                    "Failed to fetch the device. Received an invalid status code.",
+                    null,
+                    response.status,
+                    response.request,
+                    response,
+                    response.config
+                );
+            }
+
+            return Promise.resolve(response.data as DeviceResponseInterface);
+        })
+        .catch((error: AxiosError<HttpErrorResponseDataInterface>) => {
+            throw new IdentityAppsApiException(
+                error.message,
+                error.stack,
+                error.response?.data?.code,
+                error.request,
+                error.response,
+                error.config
+            );
+        });
 };
 
 /**
@@ -74,10 +125,12 @@ export const getDeviceById = (deviceId: string): Promise<DeviceResponseInterface
  *
  * @param deviceId - UUID of the device.
  * @returns Resolved on 204 No Content.
+ * @throws Throws an IdentityAppsApiException if the request fails.
  */
 export const deleteDevice = (deviceId: string): Promise<void> => {
     const requestConfig: RequestConfigInterface = {
         headers: {
+            Accept: "application/json",
             "Content-Type": "application/json"
         },
         method: HttpMethods.DELETE,
@@ -85,6 +138,28 @@ export const deleteDevice = (deviceId: string): Promise<void> => {
     };
 
     return httpClient(requestConfig)
-        .then(() => Promise.resolve())
-        .catch((error: unknown) => Promise.reject(error));
+        .then((response: AxiosResponse) => {
+            if (response.status !== 204) {
+                throw new IdentityAppsApiException(
+                    "Failed to delete the device. Received an invalid status code.",
+                    null,
+                    response.status,
+                    response.request,
+                    response,
+                    response.config
+                );
+            }
+
+            return Promise.resolve();
+        })
+        .catch((error: AxiosError<HttpErrorResponseDataInterface>) => {
+            throw new IdentityAppsApiException(
+                error.message,
+                error.stack,
+                error.response?.data?.code,
+                error.request,
+                error.response,
+                error.config
+            );
+        });
 };

@@ -16,6 +16,8 @@
  * under the License.
  */
 
+import Chip from "@oxygen-ui/react/Chip";
+import TextField from "@oxygen-ui/react/TextField";
 import { FeatureAccessConfigInterface, useRequiredScopes } from "@wso2is/access-control";
 import { getEmptyPlaceholderIllustrations } from "@wso2is/admin.core.v1/configs/ui";
 import { AppConstants } from "@wso2is/admin.core.v1/constants/app-constants";
@@ -55,10 +57,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import {
     DropdownProps,
-    Form,
     Header,
-    Input,
-    Label,
     Modal,
     PaginationProps,
     SemanticICONS
@@ -85,9 +84,9 @@ export const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
 
     const [ listItemLimit, setListItemLimit ] = useState<number>(DEFAULT_LIMIT);
     const [ listOffset, setListOffset ] = useState<number>(0);
-    const [ deletingDevice, setDeletingDevice ] = useState<DeviceResponseInterface>(null);
+    const [ deletingDevice, setDeletingDevice ] = useState<DeviceResponseInterface | null>(null);
     const [ showDeleteConfirmationModal, setShowDeleteConfirmationModal ] = useState<boolean>(false);
-    const [ renamingDevice, setRenamingDevice ] = useState<DeviceResponseInterface>(null);
+    const [ renamingDevice, setRenamingDevice ] = useState<DeviceResponseInterface | null>(null);
     const [ newDeviceName, setNewDeviceName ] = useState<string>("");
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
 
@@ -199,14 +198,16 @@ export const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
             });
     };
 
-    const resolveStatusLabel = (status: string): ReactElement => {
-        const colour: "green" | "yellow" | "red" =
-            status === "ACTIVE" ? "green" : status === "PENDING" ? "yellow" : "red";
+    const resolveStatusChip = (status: string): ReactElement => {
+        const color: "success" | "warning" | "error" =
+            status === "ACTIVE" ? "success" : status === "PENDING" ? "warning" : "error";
 
         return (
-            <Label color={ colour } size="small">
-                { t(`users:userDevices.list.status.${ status?.toLowerCase() }`, { defaultValue: status }) }
-            </Label>
+            <Chip
+                label={ t(`users:userDevices.list.status.${ status?.toLowerCase() }`, { defaultValue: status }) }
+                color={ color }
+                size="small"
+            />
         );
     };
 
@@ -248,7 +249,7 @@ export const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
             dataIndex: "status",
             id: "status",
             key: "status",
-            render: (device: DeviceResponseInterface): ReactNode => resolveStatusLabel(device.status),
+            render: (device: DeviceResponseInterface): ReactNode => resolveStatusChip(device.status),
             title: t("users:userDevices.list.columns.status")
         },
         {
@@ -271,14 +272,6 @@ export const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
     ];
 
     const resolveTableActions = (): TableActionsInterface[] => [
-        {
-            "data-componentid": `${ componentId }-item-view-button`,
-            hidden: (): boolean => false,
-            icon: (): SemanticICONS => "eye",
-            onClick: (_e: SyntheticEvent, device: DeviceResponseInterface): void => handleDeviceView(device),
-            popupText: (): string => t("common:view"),
-            renderer: "semantic-icon"
-        },
         {
             "data-componentid": `${ componentId }-item-edit-button`,
             hidden: (): boolean => !hasUpdatePermission,
@@ -385,19 +378,15 @@ export const UserDevices: FunctionComponent<UserDevicesPropsInterface> = ({
                 >
                     <Modal.Header>{ t("users:userDevices.rename.heading") }</Modal.Header>
                     <Modal.Content>
-                        <Form id="user-device-rename-form" onSubmit={ handleDeviceRename }>
-                            <Form.Field>
-                                <label>{ t("users:userDevices.rename.nameLabel") }</label>
-                                <Input
-                                    fluid
-                                    value={ newDeviceName }
-                                    placeholder={ t("users:userDevices.rename.namePlaceholder") }
-                                    onChange={ (e: ChangeEvent<HTMLInputElement>): void =>
-                                        setNewDeviceName(e.target.value) }
-                                    data-componentid={ `${ componentId }-rename-input` }
-                                />
-                            </Form.Field>
-                        </Form>
+                        <TextField
+                            fullWidth
+                            label={ t("users:userDevices.rename.nameLabel") }
+                            value={ newDeviceName }
+                            placeholder={ t("users:userDevices.rename.namePlaceholder") }
+                            onChange={ (e: ChangeEvent<HTMLInputElement>): void =>
+                                setNewDeviceName(e.target.value) }
+                            data-componentid={ `${ componentId }-rename-input` }
+                        />
                     </Modal.Content>
                     <Modal.Actions>
                         <LinkButton

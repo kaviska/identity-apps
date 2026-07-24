@@ -16,6 +16,15 @@
  * under the License.
  */
 
+import { PenToSquareIcon } from "@oxygen-ui/react-icons";
+import Box from "@oxygen-ui/react/Box";
+import Chip from "@oxygen-ui/react/Chip";
+import Table from "@oxygen-ui/react/Table";
+import TableBody from "@oxygen-ui/react/TableBody";
+import TableCell from "@oxygen-ui/react/TableCell";
+import TableHead from "@oxygen-ui/react/TableHead";
+import TableRow from "@oxygen-ui/react/TableRow";
+import Typography from "@oxygen-ui/react/Typography";
 import { FeatureAccessConfigInterface, useRequiredScopes } from "@wso2is/access-control";
 import { AppConstants } from "@wso2is/admin.core.v1/constants/app-constants";
 import { history } from "@wso2is/admin.core.v1/helpers/history";
@@ -34,7 +43,6 @@ import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { Dispatch } from "redux";
-import { Icon, Label, Table } from "semantic-ui-react";
 import EditDevicePolicyWizard from "../components/edit-device-policy-wizard";
 import useGetDevicePolicyById from "../hooks/use-get-device-policy-by-id";
 import useGetDevicePolicyMetadata from "../hooks/use-get-device-policy-metadata";
@@ -42,11 +50,17 @@ import {
     DevicePlatformType,
     DevicePolicyExpressionInterface,
     DevicePolicyFieldDefinitionInterface,
+    DevicePolicyRuleGroupInterface,
     PolicyResourceResponseInterface
 } from "../models/device-policy";
 import { buildFieldDisplayMap, buildOperatorDisplayMap } from "../utils/device-policy-rule-utils";
 
-type DevicePolicyEditPagePropsInterface = IdentifiableComponentInterface & RouteComponentProps;
+interface DevicePolicyEditPagePathParams {
+    id: string;
+}
+
+type DevicePolicyEditPagePropsInterface = IdentifiableComponentInterface &
+    RouteComponentProps<DevicePolicyEditPagePathParams>;
 
 const PLATFORM_DISPLAY_NAMES: Record<string, string> = {
     android: "Android",
@@ -59,7 +73,7 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
     match,
     "data-componentid": componentId = "device-policy-edit-page"
 }: DevicePolicyEditPagePropsInterface): ReactElement => {
-    const policyId: string = match.params["id"]?.split("#")[0];
+    const policyId: string = match.params.id?.split("#")[0];
 
     const dispatch: Dispatch = useDispatch();
     const { t } = useTranslation();
@@ -160,32 +174,20 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
         const raw: string = expression.value?.value ?? "";
 
         if (raw === "true") {
-            return (
-                <Label color="green" size="small">
-                    <Icon name="check circle" />
-                    Enabled
-                </Label>
-            );
+            return <Chip label="Enabled" color="success" size="small" />;
         }
 
         if (raw === "false") {
-            return (
-                <Label color="red" size="small">
-                    <Icon name="times circle" />
-                    Disabled
-                </Label>
-            );
+            return <Chip label="Disabled" color="error" size="small" />;
         }
 
         if (raw.includes(",")) {
             return (
-                <span>
+                <Box sx={ { display: "flex", flexWrap: "wrap", gap: 0.5 } }>
                     { raw.split(",").map((v: string): ReactNode => (
-                        <Label key={ v } size="small" basic style={ { marginBottom: 2 } }>
-                            { v.trim() }
-                        </Label>
+                        <Chip key={ v } label={ v.trim() } size="small" variant="outlined" />
                     )) }
-                </span>
+                </Box>
             );
         }
 
@@ -201,7 +203,10 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
                 } => {
                     const platform: DevicePlatformType = platformRule.target as DevicePlatformType;
                     const expressions: DevicePolicyExpressionInterface[] =
-                        (platformRule.rule?.rules ?? []).flatMap((group) => group.expressions);
+                        (platformRule.rule?.rules ?? []).flatMap(
+                            (group: DevicePolicyRuleGroupInterface): DevicePolicyExpressionInterface[] =>
+                                group.expressions
+                        );
 
                     return {
                         menuItem: PLATFORM_DISPLAY_NAMES[platform] ?? platform,
@@ -226,61 +231,65 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
                                             ) }
                                         </p>
                                         <Table
-                                            celled
-                                            padded
                                             data-componentid={
                                                 `${ componentId }-${ platform }-conditions-table`
                                             }
                                         >
-                                            <Table.Header>
-                                                <Table.Row>
-                                                    <Table.HeaderCell>
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>
                                                         { t(
                                                             "devices:assurancePolicies.edit.sections" +
                                                             ".conditions.columns.field"
                                                         ) }
-                                                    </Table.HeaderCell>
-                                                    <Table.HeaderCell>
+                                                    </TableCell>
+                                                    <TableCell>
                                                         { t(
                                                             "devices:assurancePolicies.edit.sections" +
                                                             ".conditions.columns.operator"
                                                         ) }
-                                                    </Table.HeaderCell>
-                                                    <Table.HeaderCell>
+                                                    </TableCell>
+                                                    <TableCell>
                                                         { t(
                                                             "devices:assurancePolicies.edit.sections" +
                                                             ".conditions.columns.value"
                                                         ) }
-                                                    </Table.HeaderCell>
-                                                </Table.Row>
-                                            </Table.Header>
-                                            <Table.Body>
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
                                                 { expressions.map(
                                                     (
                                                         expression: DevicePolicyExpressionInterface
                                                     ): ReactElement => (
-                                                        <Table.Row key={ expression.field }>
-                                                            <Table.Cell>
-                                                                <strong>
+                                                        <TableRow key={ expression.field }>
+                                                            <TableCell>
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    sx={ { fontWeight: 500 } }
+                                                                >
                                                                     { platformFieldMaps[platform]
                                                                         ?.get(expression.field)
                                                                         ?? expression.field }
-                                                                </strong>
-                                                            </Table.Cell>
-                                                            <Table.Cell>
-                                                                <Label size="small" color="blue" basic>
-                                                                    { platformOperatorMaps[platform]
+                                                                </Typography>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Chip
+                                                                    label={ platformOperatorMaps[platform]
                                                                         ?.get(expression.operator)
                                                                         ?? expression.operator }
-                                                                </Label>
-                                                            </Table.Cell>
-                                                            <Table.Cell>
+                                                                    size="small"
+                                                                    variant="outlined"
+                                                                    color="primary"
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
                                                                 { formatValue(expression) }
-                                                            </Table.Cell>
-                                                        </Table.Row>
+                                                            </TableCell>
+                                                        </TableRow>
                                                     )
                                                 ) }
-                                            </Table.Body>
+                                            </TableBody>
                                         </Table>
                                     </>
                                 ) }
@@ -317,7 +326,7 @@ const DevicePolicyEditPage: FunctionComponent<DevicePolicyEditPagePropsInterface
                         onClick={ (): void => setShowEditWizard(true) }
                         data-componentid={ `${ componentId }-edit-button` }
                     >
-                        <Icon name="pencil" />
+                        <PenToSquareIcon />
                         { t("devices:assurancePolicies.edit.editButton") }
                     </PrimaryButton>
                 ) }
