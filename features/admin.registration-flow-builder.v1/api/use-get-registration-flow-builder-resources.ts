@@ -23,10 +23,8 @@ import FeatureFlagConstants from "@wso2is/admin.feature-gate.v1/constants/featur
 import useGetFlowBuilderCoreResources from "@wso2is/admin.flow-builder-core.v1/api/use-get-flow-builder-core-resources";
 import { Resources } from "@wso2is/admin.flow-builder-core.v1/models/resources";
 import { Template, TemplateTypes } from "@wso2is/admin.flow-builder-core.v1/models/templates";
-import { FlowTypes } from "@wso2is/admin.flows.v1/models/flows";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import deviceRegistrationWidgets from "../data/device-registration-widgets.json";
 import steps from "../data/steps.json";
 import templates from "../data/templates.json";
 import widgets from "../data/widgets.json";
@@ -43,7 +41,6 @@ import widgets from "../data/widgets.json";
  * @returns SWR response object containing the data, error, isLoading, isValidating, mutate.
  */
 const useGetRegistrationFlowBuilderResources = <Data = Resources, Error = RequestErrorInterface>(
-    flowType: FlowTypes = FlowTypes.REGISTRATION,
     _shouldFetch: boolean = true
 ): RequestResultInterface<Data, Error> => {
     const { data: coreResources } = useGetFlowBuilderCoreResources();
@@ -54,83 +51,35 @@ const useGetRegistrationFlowBuilderResources = <Data = Resources, Error = Reques
 
     const data: unknown = useMemo(() => {
         const isAiFeatureDisabled: boolean = !aiFeature?.enabled || aiFeature?.disabledFeatures?.includes(
-            FeatureFlagConstants.FEATURE_FLAG_KEY_MAP.AI_FLOWS_TYPES_REGISTRATION) || false;
+            FeatureFlagConstants.FEATURE_FLAG_KEY_MAP.AI_FLOWS_TYPES_REGISTRATION);
 
         const filteredTemplates: Template[] = (templates as Template[]).filter((template: Template) => {
             return !isAiFeatureDisabled || template?.type !== TemplateTypes.GeneratedWithAI;
         });
 
-        const deviceRegistrationTemplateTypes: Set<string> = new Set([
-            TemplateTypes.Blank,
-            TemplateTypes.DeviceRegistrationEmailOTP,
-            TemplateTypes.DeviceRegistrationSMSOTP
-        ]);
-
-        const deviceRegistrationOnlyTypes: Set<string> = new Set([
-            TemplateTypes.BasicDeviceRegister,
-            TemplateTypes.DeviceRegistrationEmailOTP,
-            TemplateTypes.DeviceRegistrationSMSOTP
-        ]);
-
-        const deviceRegistrationTemplates: Template[] = filteredTemplates.filter((template: Template) => {
-            return deviceRegistrationTemplateTypes.has(template?.type);
-        });
-
-        const deviceRegistrationPanelStepLabels: Set<string> = new Set([
-            "Email OTP View",
-            "SMS OTP View"
-        ]);
-
-        const deviceRegistrationSteps: any[] = (steps as any[]).filter((step: any) => {
-            return deviceRegistrationPanelStepLabels.has(step?.display?.label);
-        });
-
-        if (flowType === FlowTypes.DEVICE_REGISTRATION) {
-            // Keep all core steps for node-type registration but only show Blank View in panel.
-            const coreStepsWithPanelVisibility: any[] = (coreResources?.steps ?? []).map((step: any) => ({
-                ...step,
-                display: {
-                    ...step.display,
-                    showOnResourcePanel: step?.display?.label === "Blank View"
-                }
-            }));
-
-            return {
-                ...coreResources,
-                steps: [
-                    ...coreStepsWithPanelVisibility,
-                    ...deviceRegistrationSteps
-                ],
-                templates: deviceRegistrationTemplates,
-                widgets: deviceRegistrationWidgets
-            };
-        }
-
         return {
             ...coreResources,
             steps: [
-                ...(coreResources?.steps ?? []),
+                ...coreResources?.steps,
                 ...steps
             ],
             templates: [
-                ...(coreResources?.templates ?? []),
-                ...filteredTemplates.filter(
-                    (template: Template) => !deviceRegistrationOnlyTypes.has(template?.type)
-                )
+                ...coreResources?.templates,
+                ...filteredTemplates
             ],
             widgets: [
-                ...(coreResources?.widgets ?? []),
+                ...coreResources?.widgets,
                 ...widgets
             ]
         };
-    }, [ coreResources, aiFeature, flowType ]);
+    }, [ coreResources, aiFeature ]);
 
     return {
         data: data as Data,
-        error: undefined,
+        error: null,
         isLoading: false,
         isValidating: false,
-        mutate: () => Promise.resolve(undefined)
+        mutate: () => null
     };
 };
 

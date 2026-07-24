@@ -20,7 +20,6 @@ import FlowBuilder from "@wso2is/admin.flow-builder-core.v1/components/flow-buil
 import VisualFlowConstants from "@wso2is/admin.flow-builder-core.v1/constants/visual-flow-constants";
 import useAuthenticationFlowBuilderCore from
     "@wso2is/admin.flow-builder-core.v1/hooks/use-authentication-flow-builder-core-context";
-import { FlowTypes } from "@wso2is/admin.flows.v1/models/flows";
 import {
     BlockTypes,
     ButtonTypes,
@@ -77,15 +76,13 @@ import useDefaultFlow from "../hooks/use-default-flow";
 import useGenerateRegistrationFlow, {
     UseGenerateRegistrationFlowFunction
 } from "../hooks/use-generate-registration-flow";
+import DEFAULT_END_NODE_TEMPLATE from "../migrations/templates/default-end-node.json";
 import { RegistrationStaticStepTypes } from "../models/flow";
 
 /**
  * Props interface of {@link RegistrationFlowBuilderCore}
  */
 type RegistrationFlowBuilderCorePropsInterface = IdentifiableComponentInterface;
-interface RegistrationFlowBuilderCoreExtendedPropsInterface extends RegistrationFlowBuilderCorePropsInterface {
-    flowType?: FlowTypes;
-}
 
 /**
  * Main component that wraps the `FlowBuilder` from the flow builder core.
@@ -93,11 +90,10 @@ interface RegistrationFlowBuilderCoreExtendedPropsInterface extends Registration
  * @param props - Props injected to the component.
  * @returns RegistrationFlowBuilder component.
  */
-const RegistrationFlowBuilderCore: FunctionComponent<RegistrationFlowBuilderCoreExtendedPropsInterface> = ({
+const RegistrationFlowBuilderCore: FunctionComponent<RegistrationFlowBuilderCorePropsInterface> = ({
     "data-componentid": componentId = "registration-flow-builder-core",
-    flowType = FlowTypes.REGISTRATION,
     ...rest
-}: RegistrationFlowBuilderCoreExtendedPropsInterface): ReactElement => {
+}: RegistrationFlowBuilderCorePropsInterface): ReactElement => {
     const { addEmailVerificationEdges, addEmailVerificationNodes } = useDefaultFlow();
 
     const updateNodeInternals: UpdateNodeInternals = useUpdateNodeInternals();
@@ -136,9 +132,9 @@ const RegistrationFlowBuilderCore: FunctionComponent<RegistrationFlowBuilderCore
         error: registrationFlowFetchRequestError,
         isLoading: isRegistrationFlowFetchRequestLoading,
         isValidating: isRegistrationFlowFetchRequestValidating
-    } = useGetRegistrationFlow(flowType);
+    } = useGetRegistrationFlow();
 
-    const { data: resources } = useGetRegistrationFlowBuilderResources(flowType);
+    const { data: resources } = useGetRegistrationFlowBuilderResources();
 
     const { steps, templates } = resources;
 
@@ -547,26 +543,57 @@ const RegistrationFlowBuilderCore: FunctionComponent<RegistrationFlowBuilderCore
         return edges;
     };
 
-    const initialNodes: Node[] = useMemo<Node[]>(() => {
-        const initialTemplateType: TemplateTypes = flowType === FlowTypes.DEVICE_REGISTRATION
-            ? TemplateTypes.BasicDeviceRegister
-            : TemplateTypes.Basic;
-
-        const template: Template = cloneDeep(
-            templates.find((t: Template) => t.type === initialTemplateType)
+    const getBasicTemplateStepsWithoutOnBoardingStep: () => Step[] = useCallback(() => {
+        const basicTemplate: Template = cloneDeep(
+            templates.find((template: Template) => template.type === TemplateTypes.Basic)
         );
 
-        const steps: Step[] = template?.config?.data?.steps ?? [];
+        const templateSteps: Step[] = basicTemplate?.config?.data?.steps ?? [];
 
-        if (steps.length === 0) {
+        if (templateSteps.length === 0) {
             return [];
         }
 
-        const nodes: Node[] = generateSteps(steps as any);
-        const replacers: any = template?.config?.data?.__generationMeta__?.replacers ?? [];
+        // Drop the last step from the template.
+        const stepsWithoutLast: Step[] = templateSteps.slice(0, -1);
 
-        return updateTemplatePlaceholderReferences(nodes, replacers)[0] as Node[];
-    }, [ generateSteps, templates, flowType ]);
+        // Resolve IDs and metadata for downstream usage.
+        const withIds: Step[] = generateIdsForResources<Step[]>(stepsWithoutLast) as unknown as Step[];
+
+        const withResolvedComponents: Step[] = withIds.map((s: Step) => {
+            if (s?.data?.components) {
+                return {
+                    ...s,
+                    data: {
+                        ...s.data,
+                        components: resolveComponentMetadata(resources, s.data.components as any)
+                    }
+                };
+            }
+
+            return s;
+        });
+
+        return resolveStepMetadata(resources, withResolvedComponents) as Step[];
+    }, [ templates, resources ]);
+
+    const initialNodes: Node[] = useMemo<Node[]>(() => {
+        // Try to seed from Basic template (without the last step).
+        const basicSteps: Step[] = getBasicTemplateStepsWithoutOnBoardingStep();
+
+        if (basicSteps.length > 0) {
+            const seedNodes: Node[] = [
+                ...basicSteps,
+                {
+                    ...DEFAULT_END_NODE_TEMPLATE,
+                    deletable: false,
+                    position: { x: 1200, y: 408 }
+                }
+            ];
+
+            return generateSteps(seedNodes);
+        }
+    }, [ getBasicTemplateStepsWithoutOnBoardingStep, generateSteps ]);
 
     const [ nodes, setNodes, onNodesChange ] = useNodesState([]);
     const [ edges, setEdges, onEdgesChange ] = useEdgesState([]);
